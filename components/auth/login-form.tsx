@@ -19,11 +19,19 @@ import { Button } from "../ui/button";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { login } from "@/actions/login";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 export const LoginForm = () => {
-    const [error, setError] = useState<string | undefined>("");
-    const [success, setSuccess] = useState<string | undefined>("");
-    const [isPending, startTransition] = useTransition();
+  const searchParam = useSearchParams();
+  const urlError =
+    searchParam.get("error") === "OAuthAccountNotLinked"
+      ? "Email already in use with different provider!"
+      : "";
+
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -36,18 +44,15 @@ export const LoginForm = () => {
   const handleSubmit = async (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
-    
+
     try {
-        startTransition(() => {
-            login(values)
-            .then((data: any) => {
-                setError(data?.error);
-                setSuccess(data?.success)
-            })
+      startTransition(() => {
+        login(values).then((data: any) => {
+          setError(data?.error);
+          setSuccess(data?.success);
         });
-    } catch (error) {   
-        
-    }
+      });
+    } catch (error) {}
   };
 
   return (
@@ -85,15 +90,29 @@ export const LoginForm = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input {...field}
-                    disabled={isPending} placeholder="******" type="password" />
+                    <Input
+                      {...field}
+                      disabled={isPending}
+                      placeholder="******"
+                      type="password"
+                    />
                   </FormControl>
+                  <Button
+                  size={"sm"}
+                  variant="link"
+                  asChild
+                  className="px-0 font-normal"
+                  >
+                    <Link href="/auth/reset">
+                      Forgot Password ?
+                    </Link>
+                  </Button>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || (urlError as string)} />
           <FormSuccess message={success} />
           <Button type="submit" className="w-full">
             Login

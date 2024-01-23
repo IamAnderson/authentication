@@ -1,6 +1,6 @@
 //This routes are publicly accessible 
 export const publicRoutes =[
-    "/",
+    "/", "/auth/new-verification",
 ];
 
 //Used for authentication
@@ -8,6 +8,8 @@ export const publicRoutes =[
 export const authRoutes = [
     "/auth/login",
     "/auth/register",
+    "/auth/reset",
+    "/auth/new-password",
 ];
 
 //Prefix for API authentication routes 

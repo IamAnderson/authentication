@@ -3,11 +3,11 @@
 import * as z from "zod";
 import { AuthError } from "next-auth";
 
-import { db } from "@/lib/db";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { generateVerificationToken } from "@/lib/tokens";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
@@ -27,12 +27,19 @@ export const login = async (
     return { error: "Email does not exist!" };
   }
 
+  if(!existingUser?.emailVerified) {
+    await generateVerificationToken(existingUser.email);
+
+    return { success: "Confirmation email sent!" }
+  }
+
   try {
     await signIn("credentials", {
       email,
       password,
       redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
     });
+
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
