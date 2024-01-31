@@ -87,7 +87,7 @@ const SettingsPage = () => {
             className="space-y-6" 
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            {/* <div className="space-y-4">
+            <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -215,7 +215,7 @@ const SettingsPage = () => {
                   )}
                 />
               )}
-            </div> */}
+            </div>
             <FormError message={error} />
             <FormSuccess message={success} />
             <Button
